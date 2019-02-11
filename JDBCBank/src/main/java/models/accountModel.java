@@ -2,24 +2,24 @@ package models;
 
 public class accountModel {
 	private String name;
-	private String ID;
-	private String user;
+	private int ID;
+	private int user;
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getID() {
+	public int getID() {
 		return ID;
 	}
-	public void setID(String iD) {
+	public void setID(int iD) {
 		ID = iD;
 	}
-	public String getUser() {
+	public int getUser() {
 		return user;
 	}
-	public void setUser(String user) {
+	public void setUser(int user) {
 		this.user = user;
 	}
 	public double getBalance() {

@@ -17,10 +17,11 @@ public class ConnectionUtil {
 	
 	public static Connection getConnection() throws SQLException, ClassNotFoundException {
 		Class.forName("oracle.jdbc.driver.OracleDriver");
-		if (con != null) {
-			return con;
+		if (con == null) {
+			con=DriverManager.getConnection("jdbc:oracle:thin:@myrds.ctyify3t5omm.us-east-2.rds.amazonaws.com:1521:ORCL", "Joseph_Spencer", "y:e8sQthq3ft5J2");
 		}
-		con=DriverManager.getConnection("jdbc:oracle:thin:@myrds.ctyify3t5omm.us-east-2.rds.amazonaws.com:1521:ORCL", "Joseph_Spencer", "y:e8sQthq3ft5J2");
+		
+		
 		return con;
 	}
 }
