@@ -15,9 +15,6 @@ import models.accountModel;
 
 public class accountDAO {
 	public static Optional<ArrayList<accountModel>> getAccounts(int id, Connection con) throws ClassNotFoundException, SQLException{
-			
-			
-	
 			Statement stmt = con.createStatement();
 			ArrayList<accountModel> accounts = new ArrayList<accountModel>();
 			ResultSet rs = stmt.executeQuery("SELECT USER_ID, ACCOUNT_NAME, ACCOUNT_ID, BALANCE FROM ACCOUNTS where User_ID = "+id);
@@ -59,6 +56,18 @@ public class accountDAO {
 		cs.setNull(2, Types.NULL);
 		cs.setInt(3, user_id);
 		cs.setDouble(4, 0);
+		boolean r=true;
+		try{
+			cs.execute();
+		}catch(Exception e) {
+			r=false;
+		}
+		return r;
+	}
+	public static boolean deleteAccount(int id, Connection con) throws SQLException {
+		String sql = "delete from accounts where account_id=?";
+		CallableStatement cs = con.prepareCall(sql);
+		cs.setInt(1, id);
 		boolean r=true;
 		try{
 			cs.execute();

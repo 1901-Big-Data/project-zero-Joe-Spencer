@@ -15,12 +15,19 @@ public class ConnectionUtil {
 		
 	}
 	
-	public static Connection getConnection() throws SQLException, ClassNotFoundException {
+	public static Connection getConnection() throws SQLException, ClassNotFoundException, IOException {
 		Class.forName("oracle.jdbc.driver.OracleDriver");
-		if (con == null) {
-			con=DriverManager.getConnection("jdbc:oracle:thin:@myrds.ctyify3t5omm.us-east-2.rds.amazonaws.com:1521:ORCL", "Joseph_Spencer", "y:e8sQthq3ft5J2");
-		}
 		
+		if (con == null) {
+			Properties prop = new Properties();
+			InputStream in = new FileInputStream("C:\\Users\\Joe\\Documents\\Project0\\JDBCBank\\JDBCBank.properties");
+			prop.load(in);
+			String url = prop.getProperty("jdbc.url");
+			String username = prop.getProperty("jdbc.username");
+			String pass = prop.getProperty("jdbc.pass");
+			con = DriverManager.getConnection(url, username, pass);
+			//con=DriverManager.getConnection("jdbc:oracle:thin:@myrds.ctyify3t5omm.us-east-2.rds.amazonaws.com:1521:ORCL", "Joseph_Spencer", "y:e8sQthq3ft5J2");
+		}
 		
 		return con;
 	}
