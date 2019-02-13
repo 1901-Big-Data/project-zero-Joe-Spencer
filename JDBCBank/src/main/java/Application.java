@@ -138,7 +138,6 @@ public class Application {
 					for(int i =0; i<users.size();i++) {
 						System.out.println(users.get(i).getUserName()+" id: "+users.get(i).getID()+" password: "+users.get(i).getPassword());
 					}
-					System.out.println("\n");
 				}else {
 					System.out.println("no users found");
 				}

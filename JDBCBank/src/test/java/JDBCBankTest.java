@@ -16,7 +16,7 @@ import dao.accountDAO;
 import dao.userDAO;
 import models.accountModel;
 import util.ConnectionUtil;
-public class JDBCBanktest {
+public class JDBCBankTest {
 
 	public Connection con;
 	

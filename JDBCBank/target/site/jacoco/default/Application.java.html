@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Application.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JDBCBank</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">Application.java</span></div><h1>Application.java</h1><pre class="source lang-java linenums">import java.util.*;
+
+import dao.accountDAO;
+import dao.userDAO;
+import models.accountModel;
+import models.userModel;
+import bankExceptions.*;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+
+import java.sql.SQLException;
+
+import util.ConnectionUtil;
+
+<span class="nc" id="L18">public class Application {</span>
+	private static Scanner s;
+<span class="nc" id="L20">	private static Properties prop = new Properties();</span>
+	public static void main(String[] args) throws SQLException, ClassNotFoundException, IOException {
+<span class="nc" id="L22">		boolean running = true;</span>
+<span class="nc" id="L23">		s = new Scanner(System.in);</span>
+<span class="nc" id="L24">		InputStream in = new FileInputStream(&quot;C:\\Users\\Joe\\Documents\\Project0\\JDBCBank\\JDBCBank.properties&quot;);</span>
+<span class="nc" id="L25">		prop.load(in);</span>
+<span class="nc" id="L26">		Connection con = ConnectionUtil.getConnection();</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">		while(running) {</span>
+<span class="nc" id="L28">			System.out.println(&quot;Are you a registered user with us? (Y/N)&quot;);</span>
+<span class="nc" id="L29">			String next = s.nextLine();</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">			if(next.equalsIgnoreCase(&quot;y&quot;)) {</span>
+<span class="nc" id="L31">				System.out.println(&quot;Enter username:&quot;);</span>
+<span class="nc" id="L32">				String userName = s.nextLine();</span>
+<span class="nc" id="L33">				System.out.println(&quot;Enter password for &quot;+ userName);</span>
+<span class="nc" id="L34">				String password = s.nextLine();</span>
+<span class="nc" id="L35">				String superUserName= prop.getProperty(&quot;super.name&quot;);</span>
+<span class="nc" id="L36">				String superPassword= prop.getProperty(&quot;super.pass&quot;);</span>
+<span class="nc" id="L37">				Optional&lt;userModel&gt; user = userDAO.getUser(userName, password, con);</span>
+<span class="nc bnc" id="L38" title="All 4 branches missed.">				if(userName.equals(superUserName)&amp;&amp;password.equals(superPassword)){</span>
+<span class="nc" id="L39">					superUser(superUserName, con);</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">				}else if(user.isPresent()) {</span>
+<span class="nc" id="L41">					userModel u = user.get();</span>
+<span class="nc" id="L42">					boolean loggedIn=true;</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">					while(loggedIn) {</span>
+<span class="nc" id="L44">					Optional&lt;ArrayList&lt;accountModel&gt;&gt; accounts =accountDAO.getAccounts(u.getID(), con);</span>
+<span class="nc" id="L45">					System.out.println(&quot;What would you like to do? \n1. Access my accounts \n2. Create a new account\n3. Logout&quot;);</span>
+<span class="nc" id="L46">					int selection = s.nextInt();</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">						if(accounts.isPresent() &amp;&amp; selection == 1) {</span>
+<span class="nc" id="L48">							ArrayList&lt;accountModel&gt; accountModels =accounts.get();</span>
+<span class="nc" id="L49">							System.out.println(&quot;Which account would you like to access?&quot;);</span>
+							int i;
+<span class="nc bnc" id="L51" title="All 2 branches missed.">							for(i =0; i&lt;accountModels.size();i++) {</span>
+<span class="nc" id="L52">								System.out.println((i+1)+&quot;. &quot;+accountModels.get(i).getName());</span>
+							}
+<span class="nc" id="L54">							selection = s.nextInt();</span>
+<span class="nc" id="L55">							accountModel thisAccount =accountModels.get(selection-1);</span>
+<span class="nc" id="L56">							System.out.println(&quot;Account balance is &quot;+thisAccount.getBalance());</span>
+<span class="nc" id="L57">							System.out.println(&quot;What would you like to do with this account? \n1. Withdraw \n2. Deposit \n3. delete \n4. nothing&quot;);</span>
+<span class="nc" id="L58">							selection = s.nextInt();</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">							if(selection == 1) {</span>
+<span class="nc" id="L60">								System.out.println(&quot;How much would you like to withdraw?&quot;);</span>
+<span class="nc" id="L61">								double amount = s.nextDouble();</span>
+<span class="nc" id="L62">								double newBalance= (thisAccount.getBalance()-amount);</span>
+								try {
+<span class="nc" id="L64">									accountDAO.updateBalance(thisAccount.getID(), newBalance, con);</span>
+<span class="nc" id="L65">								}</span>
+<span class="nc" id="L66">								catch(OverdraftException e) {</span>
+<span class="nc" id="L67">									System.out.println(&quot;Withdrawl failed, overdraft exception&quot;);</span>
+								}
+								
+<span class="nc bnc" id="L70" title="All 2 branches missed.">							}else if(selection == 2) {</span>
+<span class="nc" id="L71">								System.out.println(&quot;How much would you like to deposit?&quot;);</span>
+<span class="nc" id="L72">								double amount = s.nextDouble();</span>
+<span class="nc" id="L73">								double newBalance= (thisAccount.getBalance()+amount);</span>
+								try {
+<span class="nc" id="L75">									accountDAO.updateBalance(thisAccount.getID(), newBalance, con);</span>
+<span class="nc" id="L76">								}</span>
+<span class="nc" id="L77">								catch(OverdraftException e) {</span>
+<span class="nc" id="L78">									System.out.println(&quot;Withdrawl failed, overdraft exception&quot;);</span>
+								}
+								
+<span class="nc bnc" id="L81" title="All 2 branches missed.">							}else if(selection == 3) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">								if(thisAccount.getBalance()==0) {</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">									if(accountDAO.deleteAccount(thisAccount.getID(), con)) {</span>
+<span class="nc" id="L84">										System.out.println(&quot;Successfully deleted account&quot;);</span>
+									}
+<span class="nc" id="L86">								}else {</span>
+<span class="nc" id="L87">									System.out.println(&quot;Cannot delete an account if the blance is not 0&quot;);</span>
+								}
+							}
+							
+<span class="nc bnc" id="L91" title="All 2 branches missed.">						}else if(selection == 1) {</span>
+<span class="nc" id="L92">							System.out.println(&quot;no account is present&quot;);</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">						}else if(selection == 2){</span>
+<span class="nc" id="L94">							s.reset();</span>
+<span class="nc" id="L95">							System.out.println(&quot;What would you like to call your account?&quot;);</span>
+<span class="nc" id="L96">							next = s.next();</span>
+<span class="nc" id="L97">							accountDAO.createAccount(next, u.getID(), con);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">						}else if(selection == 3) {</span>
+<span class="nc" id="L99">							loggedIn = false;</span>
+						}
+<span class="nc" id="L101">						s.nextLine();</span>
+					}
+<span class="nc" id="L103">				}else {</span>
+<span class="nc" id="L104">					System.out.println(&quot;Incorrect username or password&quot;);</span>
+				}
+<span class="nc" id="L106">			}</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">			else if(next.equalsIgnoreCase(&quot;n&quot;)) {</span>
+<span class="nc" id="L108">				System.out.println(&quot;Would you like to create a profile with us? (Y/N)&quot;);</span>
+<span class="nc" id="L109">				next = s.nextLine();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">				if(next.equalsIgnoreCase(&quot;y&quot;)){</span>
+<span class="nc" id="L111">					System.out.println(&quot;Enter your desired username:&quot;);</span>
+<span class="nc" id="L112">					String username = s.nextLine();</span>
+<span class="nc" id="L113">					System.out.println(&quot;Enter your desired password:&quot;);</span>
+<span class="nc" id="L114">					String password = s.nextLine();</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">					if(userDAO.createUser(username, password, con)) {</span>
+<span class="nc" id="L116">						System.out.println(&quot;user created&quot;);</span>
+<span class="nc" id="L117">					}else {</span>
+<span class="nc" id="L118">						System.out.println(&quot;Failed to create account&quot;);</span>
+					}
+				}
+			}
+			
+		}
+
+<span class="nc" id="L125">	}</span>
+	public static void superUser(String n, Connection con) throws SQLException, ClassNotFoundException {
+<span class="nc" id="L127">		System.out.println(&quot;Hello superuser, &quot;+n);</span>
+<span class="nc" id="L128">		boolean loggedIn=true;</span>
+<span class="nc" id="L129">		s = new Scanner(System.in);</span>
+		int selection;
+<span class="nc bnc" id="L131" title="All 2 branches missed.">		while(loggedIn) {</span>
+<span class="nc" id="L132">			System.out.println(&quot;What would you like to do? \n1. View all users \n2. Create a new user \n3. Delete a user \n4. Update a user's password \n5. Logout&quot;);</span>
+<span class="nc" id="L133">			selection = s.nextInt();</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">			if(selection == 1){</span>
+<span class="nc" id="L135">				Optional&lt;ArrayList&lt;userModel&gt;&gt; usersOptional=userDAO.getAll(con);</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">				if(usersOptional.isPresent()) {</span>
+<span class="nc" id="L137">					ArrayList&lt;userModel&gt; users= usersOptional.get();</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">					for(int i =0; i&lt;users.size();i++) {</span>
+<span class="nc" id="L139">						System.out.println(users.get(i).getUserName()+&quot; id: &quot;+users.get(i).getID()+&quot; password: &quot;+users.get(i).getPassword());</span>
+					}
+<span class="nc" id="L141">				}else {</span>
+<span class="nc" id="L142">					System.out.println(&quot;no users found&quot;);</span>
+				}
+				
+<span class="nc bnc" id="L145" title="All 2 branches missed.">			}else if(selection == 2){</span>
+<span class="nc" id="L146">				System.out.println(&quot;Enter a username:&quot;);</span>
+				String userName;
+<span class="nc" id="L148">				s.nextLine();</span>
+<span class="nc" id="L149">				userName = s.nextLine();</span>
+<span class="nc" id="L150">				System.out.println(&quot;Enter a password:&quot;);</span>
+				String password;
+<span class="nc" id="L152">				password= s.nextLine();</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">				if(userDAO.createUser(userName, password, con)) {</span>
+<span class="nc" id="L154">					System.out.println(&quot;user created&quot;);</span>
+<span class="nc" id="L155">				}else {</span>
+<span class="nc" id="L156">					System.out.println(&quot;Failed to create account&quot;);</span>
+				}
+<span class="nc bnc" id="L158" title="All 2 branches missed.">			}else if(selection == 3){</span>
+<span class="nc" id="L159">				System.out.println(&quot;Enter the id of the user you wish to delete&quot;);</span>
+<span class="nc" id="L160">				selection = s.nextInt();</span>
+<span class="nc" id="L161">				Optional&lt;ArrayList&lt;accountModel&gt;&gt; accounts =accountDAO.getAccounts(selection, con);</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">				if(accounts.isPresent()) {</span>
+<span class="nc" id="L163">					System.out.println(&quot;You cannot delete a user who has open accounts&quot;);</span>
+<span class="nc" id="L164">				}else {</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">					if(userDAO.deleteUser(selection, con)) {</span>
+<span class="nc" id="L166">						System.out.println(&quot;User deleted&quot;);</span>
+<span class="nc" id="L167">					}else {</span>
+<span class="nc" id="L168">						System.out.println(&quot;Failed to delete user&quot;);</span>
+					}
+				}
+<span class="nc bnc" id="L171" title="All 2 branches missed.">			}else if(selection == 4){</span>
+<span class="nc" id="L172">				System.out.println(&quot;Enter the id of the user whose password you wish to change&quot;);</span>
+				int id;
+				String password;
+				
+<span class="nc" id="L176">				id=s.nextInt();</span>
+<span class="nc" id="L177">				System.out.println(&quot;Enter the new password&quot;);</span>
+<span class="nc" id="L178">				s.nextLine();</span>
+<span class="nc" id="L179">				password=s.nextLine();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">				if(userDAO.changePassword(id, password, con)) {</span>
+<span class="nc" id="L181">					System.out.println(&quot;Password changed&quot;);</span>
+<span class="nc" id="L182">				}else {</span>
+<span class="nc" id="L183">					System.out.println(&quot;Failed to change password&quot;);</span>
+				}
+<span class="nc bnc" id="L185" title="All 2 branches missed.">			}else if(selection == 5){</span>
+<span class="nc" id="L186">				s.nextLine();</span>
+<span class="nc" id="L187">				loggedIn=false;</span>
+			}
+			
+		}
+<span class="nc" id="L191">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
