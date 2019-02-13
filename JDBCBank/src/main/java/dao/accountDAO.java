@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import models.accountModel;
+import bankExceptions.OverdraftException;
 
 
 public class accountDAO {
@@ -36,7 +37,10 @@ public class accountDAO {
 			}
 			
 	}
-	public static boolean updateBalance(int id, double newBalance, Connection con) throws SQLException {
+	public static boolean updateBalance(int id, double newBalance, Connection con) throws SQLException, OverdraftException {
+		if(newBalance <0) {
+			throw new OverdraftException();
+		}
 		String sql = "Update accounts set balance=? where account_id=?";
 		CallableStatement cs = con.prepareCall(sql);
 		cs.setDouble(1, newBalance);

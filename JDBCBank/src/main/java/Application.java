@@ -60,20 +60,22 @@ public class Application {
 								System.out.println("How much would you like to withdraw?");
 								double amount = s.nextDouble();
 								double newBalance= (thisAccount.getBalance()-amount);
-								if(newBalance >=0 && accountDAO.updateBalance(thisAccount.getID(), newBalance, con)) {
-									System.out.println("Withdrawl successful, your new balance is "+newBalance);
-								}else {
-									System.out.println("Withdrawl failed");
+								try {
+									accountDAO.updateBalance(thisAccount.getID(), newBalance, con);
+								}
+								catch(OverdraftException e) {
+									System.out.println("Withdrawl failed, overdraft exception");
 								}
 								
 							}else if(selection == 2) {
 								System.out.println("How much would you like to deposit?");
 								double amount = s.nextDouble();
 								double newBalance= (thisAccount.getBalance()+amount);
-								if(amount >=0 && accountDAO.updateBalance(thisAccount.getID(), newBalance, con)) {
-									System.out.println("Deposit successful, your new balance is "+newBalance);
-								}else {
-									System.out.println("Deposit failed");
+								try {
+									accountDAO.updateBalance(thisAccount.getID(), newBalance, con);
+								}
+								catch(OverdraftException e) {
+									System.out.println("Withdrawl failed, overdraft exception");
 								}
 								
 							}else if(selection == 3) {
@@ -82,7 +84,7 @@ public class Application {
 										System.out.println("Successfully deleted account");
 									}
 								}else {
-									System.out.println("Account balance must be zero to delete");
+									System.out.println("Cannot delete an account if the blance is not 0");
 								}
 							}
 							
@@ -155,7 +157,7 @@ public class Application {
 					System.out.println("Failed to create account");
 				}
 			}else if(selection == 3){
-				System.out.println("Enter the id of the user you wish to delte");
+				System.out.println("Enter the id of the user you wish to delete");
 				selection = s.nextInt();
 				Optional<ArrayList<accountModel>> accounts =accountDAO.getAccounts(selection, con);
 				if(accounts.isPresent()) {
@@ -182,6 +184,7 @@ public class Application {
 					System.out.println("Failed to change password");
 				}
 			}else if(selection == 5){
+				s.nextLine();
 				loggedIn=false;
 			}
 			
