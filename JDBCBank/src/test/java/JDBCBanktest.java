@@ -1,13 +1,12 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.sql.CallableStatement;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+
 import java.sql.Statement;
-import java.sql.Types;
+
 import java.util.ArrayList;
 
 import org.junit.*;
@@ -25,7 +24,7 @@ public class JDBCBanktest {
 	public ExpectedException expectedException = ExpectedException.none();
 	
 	@Test
-	public void testCreatUserGetUser() {
+	public void testCreatUserandGetUser() {
 		try {
 			con = ConnectionUtil.getConnection();
 			con.setAutoCommit(false);
@@ -61,7 +60,6 @@ public class JDBCBanktest {
 				count++;
 			}
 			int num = userDAO.getAll(con).get().size();
-			System.out.println(count+" "+num);
 			assertEquals(num, count);
 			con.rollback();
 		}catch(Exception e){
@@ -87,7 +85,7 @@ public class JDBCBanktest {
 	
 	//accounts
 	@Test
-	public void testCreateAccountGetACcounts() {
+	public void testCreateAccountandGetAccounts() {
 		try {
 			con = ConnectionUtil.getConnection();
 			con.setAutoCommit(false);
@@ -146,7 +144,6 @@ public class JDBCBanktest {
 			accountDAO.createAccount("testacc1", id, con);
 			ArrayList<accountModel> accountModels = accountDAO.getAccounts(id, con).get();
 			int accid=0;
-			accountModel account= new accountModel();
 			for(int i =0; i<accountModels.size();i++) {
 				String a =accountModels.get(i).getName();
 				if( a.equalsIgnoreCase("testacc1")) {
